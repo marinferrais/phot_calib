@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 
 
 # Image vizualization
-from src.image_scaling import z_scale
+from image_scaling import z_scale
 
 #
 # --- FUNCTIONS ---------------------------------------------------------------

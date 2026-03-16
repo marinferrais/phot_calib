@@ -15,14 +15,19 @@ import argparse
 # Filesytem paths
 from pathlib import Path
 
-# FITS manipulation
+# FITS, table and time
 from astropy.io import fits, ascii
 from astropy.table import Table, vstack, unique
 from astropy.time import Time
 
+# for nan handling
 import numpy as np
 
-from telescopes_params import telescope_parameters
+# pipeline-specific imports
+import sys
+
+sys.path.append(str(Path(__file__).parents[2] / "setup"))
+from telescopes import telescope_parameters  # type: ignore
 
 #
 # --- FUNCTIONS ---------------------------------------------------------------

@@ -504,7 +504,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    listraw = Path(args.listraw)
+    listraw = Path(args.listraw).resolve()
 
     #
     # --- SCRIPT CODE ---------------------------------------------------------
