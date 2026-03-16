@@ -1,0 +1,11 @@
+[project]
+name = "phot-calib"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "eloy>=0.0.11b0",
+    "imageio[ffmpeg]>=2.37.3",
+    "tqdm>=4.67.3",
+]
