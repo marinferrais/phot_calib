@@ -34,8 +34,8 @@ import imageio.v2 as imageio
 import io
 
 # from telescopes_params import telescope_parameters
-from fits_trim import fits_trim
-from fits_log import fits_log
+from fits_trim import fits_trim  # type: ignore
+from fits_log import fits_log  # type: ignore
 
 #
 # --- FUNCTIONS ---------------------------------------------------------------
@@ -491,7 +491,7 @@ def main(dir_dataraw):
     _ = logger.info("Video done")
 
 
-# run
+#
 # --- ARGS PARSER -------------------------------------------------------------
 #
 if __name__ == "__main__":
