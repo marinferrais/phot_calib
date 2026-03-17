@@ -3,7 +3,7 @@ trappist_south_param = {
     "instrument": "FLI-New",  # instrument keyword
     "observatory_name": "TRAPPIST-South",  # observatory denomination
     "observatory_code": "I40",  # MPC observatory code
-    "observatory_abbrv": "TS",  # observatory abbreviation
+    "observatory_abbrv": "TS",  # observatory name abbreviation
     "image_type": "IMAGETYP",  # image type kw
     "trimB1": [16, 32, 24, 0],  # image trim B1 [x1,x2,y1,y2]
     "trimB2": [8, 16, 11, 0],  # image trim B2 [x1,x2,y1,y2]
@@ -31,7 +31,7 @@ trappist_north_param = {
     "instrument": "Andor Tech",  # instrument keyword
     "observatory_name": "TRAPPIST-North",  # observatory denomination
     "observatory_code": "Z53",  # MPC observatory code
-    "observatory_abbrv": "TN",  # observatory abbreviation
+    "observatory_abbrv": "TN",  # observatory name abbreviation
     "image_type": "IMAGETYP",  # image type kw
     "trimB1": [3, 0, 21, 21],  # image trim B1 [x1,x2,y1,y2]
     "trimB2": [1, 0, 10, 11],  # image trim B2 [x1,x2,y1,y2]
@@ -58,7 +58,7 @@ robinson_param = {
     "instrument": "ZWO ASI2600MM Pro",  # instrument keyword
     "observatory_name": "Robinson Observatory",  # observatory denomination
     "observatory_code": "W39",  # MPC observatory code
-    "observatory_abbrv": "RO",  # observatory abbreviation
+    "observatory_abbrv": "RO",  # observatory name abbreviation
     "image_type": "IMAGETYP",  # image type kw
     #'trim' : [11,1034,1,1024], # image trim (python indexing), to not trim use None
     "px_scale": 0.186,  # pixel size (arcsec) in binning 1x1
