@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+
+"""FITS_PLATESOLVE - Plate solve FITS images
+
+creation : MAR 2026
+"""
+
+#
+# --- IMPORTS -----------------------------------------------------------------
+#
+
+# Command line arguments parser
+import argparse
+
+# Filesytem paths
+from pathlib import Path
+
+# FITS manipulation
+from astropy.io import fits
+from astropy.coordinates import SkyCoord
+
+# Plotting
+# import matplotlib.pyplot as plt
+
+import numpy as np
+
+# eloy
+from eloy import detection
+from twirl import compute_wcs, gaia_radecs
+from twirl.geometry import sparsify
+
+# pipeline-specific imports
+import sys
+
+sys.path.append(str(Path(__file__).parents[2] / "setup"))
+from telescopes import telescope_parameters  # type: ignore
+
+#
+# --- FUNCTIONS ---------------------------------------------------------------
+#
+
+
+def fits_platesolve(filenames, nstars=15, verbose=False, display=False):
+    """
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    """
+
+    file = filenames[len(filenames) // 2]
+    data = fits.getdata(file)
+    header = fits.getheader(file)
+    # get telescope specific params dict
+    obsparam = telescope_parameters[f"{header["TELESCOP"]} {header["INSTRUME"]}"]
+    # get pixel scale in degree
+    pixel_scale = obsparam["px_scale"] / 3600
+    # size of the field-of-view
+    fov = data.shape[1] * pixel_scale
+    # RA/Dec coordinates of the image
+    ra = header[obsparam["ra"]]
+    dec = header[obsparam["dec"]]
+    if obsparam["radec_separator"] == "XXX":
+        center = SkyCoord(ra, dec, unit=("deg", "deg"))
+    else:
+        center = SkyCoord(ra, dec, unit=("h", "deg"))
+    if verbose:
+        print(f"Image center : {center.to_string('hmsdms')}")
+    all_radecs = gaia_radecs(center, 1.5 * fov)
+    # we only keep stars 0.01 degree apart from each other
+    all_radecs = sparsify(all_radecs, 0.01)
+
+    # for file in tqdm(filenames):
+    for file in filenames:
+        if verbose:
+            print(f"Plate-solving {file}...")
+        # read image data and header
+        data = fits.getdata(file)
+        header = fits.getheader(file)
+
+        # detect stars coordinates
+        regions = detection.stars_detection(data, threshold=20, opening=2)
+        regions = sorted(regions, key=lambda x: x.image_intensity.sum(), reverse=True)
+        coords = np.array([r.centroid_weighted[::-1] for r in regions])[0:nstars]
+
+        # compute WCS
+        wcs = compute_wcs(coords, all_radecs[0:nstars], tolerance=10)
+
+        # save as FITS
+        header.update(wcs.to_header())
+        hdu = fits.PrimaryHDU(data=data, header=header)
+        hdu.writeto(file, overwrite=True)
+
+        if display:
+            # TODO : display the plate-solved image
+            pass
+
+        if verbose:
+            print("Plate-solving done")
+
+
+#
+# --- ARGS PARSER -------------------------------------------------------------
+#
+if __name__ == "__main__":
+    # command line arguments
+    parser = argparse.ArgumentParser(description="Trim fits images")
+
+    parser.add_argument("filenames", help="list of fits files", nargs="+")
+    parser.add_argument(
+        "-n", "--nstars", help="Number of catalog stars to use", type=int, default=15
+    )
+    parser.add_argument("-v", "--verbose", help="Verbose mode", action="store_true")
+    parser.add_argument(
+        "-d", "--display", help="Display plate-solved image", action="store_true"
+    )
+
+    args = parser.parse_args()
+
+    filenames = sorted(args.filenames)
+    nstars = args.nstars
+    verbose = args.verbose
+    display = args.display
+
+    #
+    # --- SCRIPT CODE ---------------------------------------------------------
+    #
+    if ("*" in filenames[0]) or "?" in filenames[0]:
+        filenames = sorted(Path().glob(filenames[0]))
+    if len(filenames) == 0:
+        print("No file found with the given pattern")
+        exit(1)
+    fits_platesolve(filenames, nstars=nstars, verbose=verbose, display=display)

@@ -214,13 +214,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument("dir_data", help="Directory containing the images", type=str)
-    parser.add_argument("-t", "--verbose", help="Verbose mode", action="store_true")
     parser.add_argument("-v", "--verbose", help="Verbose mode", action="store_true")
 
     args = parser.parse_args()
+
+    dir_data = Path(args.dir_data)
+    verbose = args.verbose
 
     #
     # --- SCRIPT CODE ---------------------------------------------------------
     #
 
-    t, logfile, obsparam = fits_log(args.dir_data, verbose=args.verbose)
+    t, logfile, obsparam = fits_log(dir_data, verbose=verbose)

@@ -17,23 +17,19 @@ from datetime import datetime
 from pathlib import Path
 from tqdm.auto import tqdm
 
-# from collections import defaultdict
-# from datetime import timedelta, date
-
 from astropy.io import fits, ascii
 from astropy.table import Table, unique
 from astropy.time import Time
-# from dateutil import parser
 
-from eloy import calibration
-from eloy import viz
+# eloy
+from eloy import calibration, viz
 
+# plot and videos
 import matplotlib.pyplot as plt
-
 import imageio.v2 as imageio
 import io
 
-# from telescopes_params import telescope_parameters
+# pipeline-specific imports
 from fits_trim import fits_trim  # type: ignore
 from fits_log import fits_log  # type: ignore
 
@@ -397,7 +393,7 @@ def make_video(t, obsparam, date_obs, dir_datacalib):
     writer.close()
 
 
-def main(dir_dataraw):
+def main(dir_dataraw, display=False):
     """
 
     Parameters
@@ -468,7 +464,12 @@ def main(dir_dataraw):
             traw_b = traw[traw["bin"] == binning]
             logger.info(f"Building B{binning} master calibrations...")
             _ = make_mcalibs(
-                traw_b, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display=True
+                traw_b,
+                obsparam,
+                logfile_mcalibs,
+                dir_datacalib,
+                nmin=5,
+                display=display,
             )
         _ = logger.info(f"Master calibrations built and logged to {logfile_mcalibs}")
 
@@ -481,6 +482,12 @@ def main(dir_dataraw):
             logger.info(f"Building calibrated images {filter} - B{binning} ...")
             _ = calibration_sequence(tsci_bf, obsparam, logfile_mcalibs, dir_datacalib)
     _ = logger.info(f"Image calibration done in {dir_datacalib}")
+
+    # TODO : add WCS columns in logs table
+    # plate-solving
+    # _ = logger.info("Plate-solving calibrated images...")
+    # fits_platesolve(tsci["filename"], nstars=15, verbose=True, display=False)
+    # _ = logger.info("Plate-solving done")
 
     # make logs of the calibrated data
     _, logfile_sci, _, _ = fits_log(dir_datacalib)
@@ -501,10 +508,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "listraw", help="File containing list of dates with raw data", type=str
     )
+    parser.add_argument(
+        "-d",
+        "--display",
+        help="Display cablibration master frames",
+        action="store_true",
+    )
 
     args = parser.parse_args()
 
     listraw = Path(args.listraw).resolve()
+    display = args.display
 
     #
     # --- SCRIPT CODE ---------------------------------------------------------
@@ -519,4 +533,4 @@ if __name__ == "__main__":
             dir_dataraw_list.append(listraw.parent / line)
 
     for dir_dataraw in dir_dataraw_list:
-        main(dir_dataraw)
+        main(dir_dataraw, display=display)
