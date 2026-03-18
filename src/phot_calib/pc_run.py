@@ -218,7 +218,10 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
     # dark
     new_dark = False
     if len(darks) >= nmin:
-        mdark = calibration.master_dark(files=darks, bias=mbias)
+        try:
+            mdark = calibration.master_dark(files=darks, bias=mbias)
+        except UnboundLocalError:
+            print("Error: master bias not found. Cannot build master dark.")
         header = fits.getheader(darks[0])
         header = edit_header(header, n=len(bias), mbias_file=mbias_file)
         mdark_file = dir_datacalib / "mdark.fits"
@@ -235,7 +238,13 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
     for filter in set(tflats["filter"]):
         flats = tflats[tflats["filter"] == filter]["filename"]
         if len(flats) >= nmin:
-            mflat = calibration.master_flat(files=flats, bias=mbias, dark=mdark)
+            try:
+                mflat = calibration.master_flat(files=flats, bias=mbias, dark=mdark)
+            except UnboundLocalError:
+                print(
+                    "Error: master bias and/or dark not found. Cannot build master flat."
+                )
+                continue
             mflats_list.append(mflat)
             filter_list.append(filter)
             header = fits.getheader(flats[0])
