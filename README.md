@@ -11,7 +11,7 @@ Rely on [eloy](https://github.com/lgrcia/eloy) for the calibration part.
 ## Installation
 
 ### Prerequisites
-- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+-  Python package and project manager: [uv](https://docs.astral.sh/uv/getting-started/installation/)
 ```bash
 pip install uv
 ```
@@ -54,7 +54,18 @@ myobservatory/
 2026-03-07
 ```
 
-3. Run the pipeline:
+3. Run the pipeline (adapt '/path_to' to your case):
 ```bash
 uv run --project /path_to/phot_calib /path_to/phot_calib/src/phot_calib/pc_run.py listraw.txt
+```
+
+or, on linux, update your .bashrc with (adapt '/path_to' to your case):
+```text
+export PATH=$PATH:/path_to/src/phot_calib
+export PYTHONPATH="${PYTHONPATH}:/path_to/src/phot_calib"
+alias pc_run='uv run --project /path_to/phot_calib/ pc_run.py'
+```
+and run with :
+```bash
+pc_run.py listraw.txt
 ```
