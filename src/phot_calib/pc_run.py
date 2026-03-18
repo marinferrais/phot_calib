@@ -405,7 +405,7 @@ def main(dir_dataraw, display=False):
 
     """
     dir_datacalib = dir_dataraw.parent.parent / "datacalib" / dir_dataraw.name
-    dir_datacalib.mkdir(exist_ok=True)
+    dir_datacalib.mkdir(parents=True, exist_ok=True)
 
     # start logs
     logger = setup_logger(dir_dataraw)
