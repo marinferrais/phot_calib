@@ -155,6 +155,10 @@ def get_mcalib(t, typ, binning, date_obs, filter=None, readoutm=None):
         # Find the closest calibration file in time
         t_sel["time_diff"] = abs(t_sel["jd_obs"] - Time(date_obs, format="isot").jd)
         t_sel.sort("time_diff")
+        if len(t_sel) == 0:
+            raise ValueError(
+                f"No master {typ} found for B{binning} {filter} {readoutm} around {date_obs}"
+            )
         return t_sel["filename"][0]
 
 
