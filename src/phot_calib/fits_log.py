@@ -154,6 +154,8 @@ def fits_log(dir_data: Path, verbose=False):
         naxis2.append(header[obsparam["extent"][1]])
         if "PIERSIDE" in header.keys():
             pierside.append(header["PIERSIDE"])
+        else:
+            pierside.append("")
 
     t = Table()
     t["filename"] = files
