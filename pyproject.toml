@@ -1,7 +1,7 @@
 [project]
 name = "phot-calib"
 version = "0.1.0"
-description = "Add your description here"
+description = "Calibration of astronomical images pipeline"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

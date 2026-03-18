@@ -59,13 +59,13 @@ myobservatory/
 uv run --project /path_to/phot_calib /path_to/phot_calib/src/phot_calib/pc_run.py listraw.txt
 ```
 
-or, on linux, update your .bashrc with (adapt '/path_to' to your case):
+or, on linux, add this to your .bashrc (adapt '/path_to' to your case):
 ```text
 export PATH=$PATH:/path_to/src/phot_calib
 export PYTHONPATH="${PYTHONPATH}:/path_to/src/phot_calib"
 alias pc_run='uv run --project /path_to/phot_calib/ pc_run.py'
 ```
-and run with :
+and run with:
 ```bash
 pc_run.py listraw.txt
 ```

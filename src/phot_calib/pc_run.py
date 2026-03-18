@@ -1,6 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
 
-"""ELOY_CALIBRATION - Perform image calibration using Eloy
+"""PC_RUN - Calibration of astronomical images pipeline
+            Rely on eloy (https://github.com/lgrcia/eloy) for the calibration.
 
 creation : FEB 2026
 """
@@ -503,7 +504,9 @@ def main(dir_dataraw, display=False):
 #
 if __name__ == "__main__":
     # command line arguments
-    parser = argparse.ArgumentParser(description="TODO")
+    parser = argparse.ArgumentParser(
+        description="Calibration of astronomical images pipeline"
+    )
 
     parser.add_argument(
         "listraw", help="File containing list of dates with raw data", type=str
