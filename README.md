@@ -67,7 +67,7 @@ alias pc_run='uv run --project /path_to/phot_calib/ pc_run.py'
 ```
 and run with:
 ```bash
-pc_run.py listraw.txt
+pc_run listraw.txt
 ```
 
 The directory will then look like that:
