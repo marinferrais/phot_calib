@@ -54,16 +54,16 @@ myobservatory/
 #2026-03-09
 ```
 
-3. Run the pipeline (change '/path_to' to where phot_calib is installed):
+3. Run the pipeline (change <path_to> to where phot_calib is installed):
 ```bash
-uv run --project /path_to/phot_calib /path_to/phot_calib/src/phot_calib/pc_run.py listraw.txt
+uv run --project <path_to>/phot_calib <path_to>/phot_calib/src/phot_calib/pc_run.py listraw.txt
 ```
 
-or, on linux, add this to your .bashrc (change '/path_to' to where phot_calib is installed):
+or, on linux, add this to your .bashrc (change <path_to> to where phot_calib is installed):
 ```text
-export PATH=$PATH:/path_to/src/phot_calib
-export PYTHONPATH="${PYTHONPATH}:/path_to/src/phot_calib"
-alias pc_run='uv run --project /path_to/phot_calib/ pc_run.py'
+export PATH=$PATH:<path_to>/src/phot_calib
+export PYTHONPATH="${PYTHONPATH}:<path_to>/src/phot_calib"
+alias pc_run='uv run --project <path_to>/phot_calib/ pc_run.py'
 ```
 and run with:
 ```bash
