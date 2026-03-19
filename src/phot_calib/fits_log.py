@@ -19,6 +19,7 @@ from pathlib import Path
 from astropy.io import fits, ascii
 from astropy.table import Table, vstack, unique
 from astropy.time import Time
+from astropy.wcs import WCS
 
 # for nan handling
 import numpy as np
@@ -99,6 +100,7 @@ def fits_log(dir_data: Path, verbose=False):
     date_obs, object, bin, typ, exptime, ccd_temp = [], [], [], [], [], []
     filter, ra, dec, airmass = [], [], [], []
     naxis1, naxis2, pierside = [], [], []
+    hasWCS = []
 
     for file in files:
         header = fits.getheader(file)
@@ -157,6 +159,12 @@ def fits_log(dir_data: Path, verbose=False):
         else:
             pierside.append("")
 
+        wcs = WCS(header)
+        if wcs.is_celestial:
+            hasWCS.append("Yes")
+        else:
+            hasWCS.append("No")
+
     t = Table()
     t["filename"] = files
     t["date_obs"] = date_obs
@@ -173,6 +181,7 @@ def fits_log(dir_data: Path, verbose=False):
     t["naxis1"] = naxis1
     t["naxis2"] = naxis2
     t["pierside"] = pierside
+    t["WCS"] = hasWCS
     if "readoutm" in obsparam.keys():
         t["readoutm"] = [readoutm] * len(t)
     # fixing string length

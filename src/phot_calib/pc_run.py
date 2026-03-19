@@ -21,6 +21,8 @@ from tqdm.auto import tqdm
 from astropy.io import fits, ascii
 from astropy.table import Table, unique
 from astropy.time import Time
+import warnings
+from astropy.wcs import FITSFixedWarning
 
 # eloy
 from eloy import calibration, viz
@@ -33,6 +35,10 @@ import io
 # pipeline-specific imports
 from fits_trim import fits_trim  # type: ignore
 from fits_log import fits_log  # type: ignore
+from fits_platesolve import fits_platesolve  # type: ignore
+
+# wanings suppresion
+warnings.simplefilter("ignore", FITSFixedWarning)
 
 #
 # --- FUNCTIONS ---------------------------------------------------------------
@@ -407,7 +413,7 @@ def make_video(t, obsparam, date_obs, dir_datacalib):
     writer.close()
 
 
-def main(dir_dataraw, display=False):
+def main(dir_dataraw, display=False, plate_solve=False):
     """
 
     Parameters
@@ -499,14 +505,16 @@ def main(dir_dataraw, display=False):
 
     # TODO : add WCS columns in logs table
     # plate-solving
-    # _ = logger.info("Plate-solving calibrated images...")
-    # fits_platesolve(tsci["filename"], nstars=15, verbose=True, display=False)
-    # _ = logger.info("Plate-solving done")
+    if plate_solve:
+        _ = logger.info("Plate-solving calibrated images...")
+        fits_platesolve(tsci["filename"], nstars=15, verbose=False, display=False)
+        _ = logger.info("Plate-solving done")
 
     # make logs of the calibrated data
     _, logfile_sci, _, _ = fits_log(dir_datacalib)
     _ = logger.info(f"Calibrated data logged in {logfile_sci}")
-    # calib video
+
+    # make video of the calibrated images
     _ = logger.info("Making video of calibrated images")
     make_video(tsci, obsparam, date_obs, dir_datacalib)
     _ = logger.info("Video done")
@@ -530,11 +538,18 @@ if __name__ == "__main__":
         help="Display cablibration master frames",
         action="store_true",
     )
+    parser.add_argument(
+        "-ps",
+        "--plate_solve",
+        help="Enable plate-solving of calibrated images",
+        action="store_true",
+    )
 
     args = parser.parse_args()
 
     listraw = Path(args.listraw).resolve()
     display = args.display
+    plate_solve = args.plate_solve
 
     #
     # --- SCRIPT CODE ---------------------------------------------------------
@@ -549,4 +564,4 @@ if __name__ == "__main__":
             dir_dataraw_list.append(listraw.parent / line)
 
     for dir_dataraw in dir_dataraw_list:
-        main(dir_dataraw, display=display)
+        main(dir_dataraw, display=display, plate_solve=plate_solve)

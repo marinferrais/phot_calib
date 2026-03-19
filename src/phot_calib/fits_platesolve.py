@@ -9,11 +9,9 @@ creation : MAR 2026
 # --- IMPORTS -----------------------------------------------------------------
 #
 
-# Command line arguments parser
 import argparse
-
-# Filesytem paths
 from pathlib import Path
+from tqdm.auto import tqdm
 
 # FITS manipulation
 from astropy.io import fits
@@ -29,6 +27,9 @@ from eloy import detection
 from twirl import compute_wcs, gaia_radecs
 from twirl.geometry import sparsify
 
+import contextlib
+import os
+
 # pipeline-specific imports
 import sys
 
@@ -38,6 +39,15 @@ from telescopes import telescope_parameters  # type: ignore
 #
 # --- FUNCTIONS ---------------------------------------------------------------
 #
+
+
+@contextlib.contextmanager
+def suppress_output():
+    with (
+        contextlib.redirect_stdout(open(os.devnull, "w")),
+        contextlib.redirect_stderr(open(os.devnull, "w")),
+    ):
+        yield
 
 
 def fits_platesolve(filenames, nstars=15, verbose=False, display=False):
@@ -73,10 +83,9 @@ def fits_platesolve(filenames, nstars=15, verbose=False, display=False):
     # we only keep stars 0.01 degree apart from each other
     all_radecs = sparsify(all_radecs, 0.01)
 
-    # for file in tqdm(filenames):
-    for file in filenames:
+    for file in tqdm(filenames):
         if verbose:
-            print(f"Plate-solving {file}...")
+            print(f"Plate-solving {file} ...")
         # read image data and header
         data = fits.getdata(file)
         header = fits.getheader(file)
@@ -87,7 +96,13 @@ def fits_platesolve(filenames, nstars=15, verbose=False, display=False):
         coords = np.array([r.centroid_weighted[::-1] for r in regions])[0:nstars]
 
         # compute WCS
-        wcs = compute_wcs(coords, all_radecs[0:nstars], tolerance=10)
+        try:
+            with suppress_output():
+                wcs = compute_wcs(coords, all_radecs[0:nstars], tolerance=10)
+        except Exception as e:
+            if verbose:
+                print(f"Error occurred while plate-solving {file}: {e}")
+            continue
 
         # save as FITS
         header.update(wcs.to_header())
@@ -129,7 +144,8 @@ if __name__ == "__main__":
     # --- SCRIPT CODE ---------------------------------------------------------
     #
     if ("*" in filenames[0]) or "?" in filenames[0]:
-        filenames = sorted(Path().glob(filenames[0]))
+        filename = Path(filenames[0])
+        filenames = sorted(Path(filename.parent).glob(filename.name))
     if len(filenames) == 0:
         print("No file found with the given pattern")
         exit(1)
