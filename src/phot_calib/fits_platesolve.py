@@ -16,14 +16,15 @@ from tqdm.auto import tqdm
 # FITS manipulation
 from astropy.io import fits
 from astropy.coordinates import SkyCoord
+import astropy.units as u
 
 # Plotting
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 import numpy as np
 
 # eloy
-from eloy import detection
+from eloy import detection, viz
 from twirl import compute_wcs, gaia_radecs
 from twirl.geometry import sparsify
 
@@ -67,7 +68,7 @@ def fits_platesolve(filenames, nstars=15, verbose=False, display=False):
     # get telescope specific params dict
     obsparam = telescope_parameters[f"{header["TELESCOP"]} {header["INSTRUME"]}"]
     # get pixel scale in degree
-    pixel_scale = obsparam["px_scale"] / 3600
+    pixel_scale = header[obsparam["binning"][0]] * obsparam["px_scale"] / 3600
     # size of the field-of-view
     fov = data.shape[1] * pixel_scale
     # RA/Dec coordinates of the image
@@ -111,7 +112,28 @@ def fits_platesolve(filenames, nstars=15, verbose=False, display=False):
 
         if display:
             # TODO : display the plate-solved image
-            pass
+            radecs_xy = np.array(wcs.world_to_pixel_values(all_radecs))[0:300]
+            fig, ax = plt.subplots(figsize=(12, 12), subplot_kw={"projection": wcs})
+            ax.imshow(viz.z_scale(data), cmap="Greys_r", origin="lower")
+            # Plot catalog stars
+            viz.plot_marks(*radecs_xy.T, color="y")
+            # Add coordinate grid
+            ax.coords.grid(True, color="white", alpha=0.2, linestyle="--")
+            fig.suptitle(file)
+            ax.set_xlabel("RA")
+            ax.set_ylabel("Dec")
+            # Format tick labels
+            ra = ax.coords["ra"]
+            dec = ax.coords["dec"]
+            ra.set_format_unit("hourangle")
+            dec.set_format_unit("deg")
+            ra.set_major_formatter("hh:mm:ss")
+            dec.set_major_formatter("dd:mm:ss")
+            # Tick spacing
+            ra.set_ticks(spacing=1 * u.arcmin)
+            dec.set_ticks(spacing=1 * u.arcmin)
+            fig.tight_layout()
+            plt.show()
 
         if verbose:
             print("Plate-solving done")
