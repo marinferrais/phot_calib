@@ -88,3 +88,10 @@ myobservatory/
     └── MO_mcalibs.log
 ```
 The calibrated are in datacalib and where dataraw/MO_2026.log are logs of the raw data, datacalib/MO_2026.log the logs of the calibrated data, and datacalib/MO_mcalibs.log the logs of the master calibration frames.
+
+Options:
+```text
+  -d, --display       Display cablibration master frames
+  -ps, --plate_solve  Enable plate-solving of calibrated images
+  -sm, --safe_mode    Recompute the pixel scale, image center and update gaia catalog for each images during plate-solving (safer but slower)
+```

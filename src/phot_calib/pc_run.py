@@ -413,7 +413,7 @@ def make_video(t, obsparam, date_obs, dir_datacalib):
     writer.close()
 
 
-def main(dir_dataraw, display=False, plate_solve=False):
+def main(dir_dataraw, display=False, plate_solve=False, safe_mode=False):
     """
 
     Parameters
@@ -503,11 +503,16 @@ def main(dir_dataraw, display=False, plate_solve=False):
             _ = calibration_sequence(tsci_bf, obsparam, logfile_mcalibs, dir_datacalib)
     _ = logger.info(f"Image calibration done in {dir_datacalib}")
 
-    # TODO : add WCS columns in logs table
     # plate-solving
     if plate_solve:
         _ = logger.info("Plate-solving calibrated images...")
-        fits_platesolve(tsci["filename"], nstars=15, verbose=False, display=False)
+        fits_platesolve(
+            tsci["filename"],
+            nstars=15,
+            safe_mode=safe_mode,
+            verbose=False,
+            display=False,
+        )
         _ = logger.info("Plate-solving done")
 
     # make logs of the calibrated data
@@ -544,12 +549,19 @@ if __name__ == "__main__":
         help="Enable plate-solving of calibrated images",
         action="store_true",
     )
+    parser.add_argument(
+        "-sm",
+        "--safe_mode",
+        help="Recompute the pixel scale, image center and update gaia catalog for each images during plate-solving (safer but slower)",
+        action="store_true",
+    )
 
     args = parser.parse_args()
 
     listraw = Path(args.listraw).resolve()
     display = args.display
     plate_solve = args.plate_solve
+    safe_mode = args.safe_mode
 
     #
     # --- SCRIPT CODE ---------------------------------------------------------
@@ -564,4 +576,4 @@ if __name__ == "__main__":
             dir_dataraw_list.append(listraw.parent / line)
 
     for dir_dataraw in dir_dataraw_list:
-        main(dir_dataraw, display=display, plate_solve=plate_solve)
+        main(dir_dataraw, display=display, plate_solve=plate_solve, safe_mode=safe_mode)
