@@ -162,10 +162,9 @@ def get_mcalib(t, typ, binning, date_obs, filter=None, readoutm=None):
         t_sel["time_diff"] = abs(t_sel["jd_obs"] - Time(date_obs, format="isot").jd)
         t_sel.sort("time_diff")
         if len(t_sel) == 0:
-            raise ValueError(
-                f"No master {typ} found for B{binning} {filter} {readoutm} around {date_obs}"
-            )
-        return t_sel["filename"][0]
+            return None
+        else:
+            return t_sel["filename"][0]
 
 
 def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display=False):
@@ -223,11 +222,12 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
         new_bias = True
     elif len(tmcalib[tmcalib["type"] == "BIAS"]) > 0:
         mbias_file = get_mcalib(tmcalib, "BIAS", binning, date_obs, readoutm=readoutm)
-        mbias = fits.getdata(mbias_file)
+        if mbias_file is not None:
+            mbias = fits.getdata(mbias_file)
 
     # dark
     new_dark = False
-    if len(darks) >= nmin:
+    if (len(darks) >= nmin) and (mbias_file is not None):
         try:
             mdark = calibration.master_dark(files=darks, bias=mbias)
         except UnboundLocalError:
@@ -240,7 +240,8 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
         new_dark = True
     elif len(tmcalib[tmcalib["type"] == "DARK"]) > 0:
         mdark_file = get_mcalib(tmcalib, "DARK", binning, date_obs, readoutm=readoutm)
-        mdark = fits.getdata(mdark_file)
+        if mdark_file is not None:
+            mdark = fits.getdata(mdark_file)
 
     # flat
     tflats = traw[traw["type"] == "FLAT"]
