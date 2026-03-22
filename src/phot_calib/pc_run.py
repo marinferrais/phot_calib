@@ -216,7 +216,7 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
         mbias = calibration.master_bias(files=bias)
         header = fits.getheader(bias[0])
         header = edit_header(header, n=len(bias))
-        mbias_file = dir_datacalib / "mbias.fits"
+        mbias_file = dir_datacalib / f"mbias_{binning}.fits"
         fits.writeto(mbias_file, mbias, header, overwrite=True)
         tmcalib = update_mcalibs(tmcalib, mbias_file, header, obsparam)
         new_bias = True
@@ -234,7 +234,7 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
             print("Error: master bias not found. Cannot build master dark.")
         header = fits.getheader(darks[0])
         header = edit_header(header, n=len(bias), mbias_file=mbias_file)
-        mdark_file = dir_datacalib / "mdark.fits"
+        mdark_file = dir_datacalib / f"mdark_{binning}.fits"
         fits.writeto(mdark_file, mdark, header, overwrite=True)
         tmcalib = update_mcalibs(tmcalib, mdark_file, header, obsparam)
         new_dark = True
@@ -262,7 +262,7 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
             header = edit_header(
                 header, n=len(bias), mbias_file=mbias_file, mdark_file=mdark_file
             )
-            mflat_file = f"mflat_{header[obsparam['filter']]}.fits"
+            mflat_file = f"mflat_{header[obsparam['filter']]}_{binning}.fits"
             mflat_file = dir_datacalib / mflat_file
             fits.writeto(mflat_file, mflat, header, overwrite=True)
             tmcalib = update_mcalibs(tmcalib, mflat_file, header, obsparam)
@@ -305,8 +305,9 @@ def calibration_sequence(t, obsparam, logfile_mcalibs, dir_datacalib):
     # get science files
     lights = t["filename"]
 
-    # get master calib frames
+    # get master calib log table
     tmcalib = ascii.read(logfile_mcalibs, format="rst")
+    # select only master frame without filter or with same filter as sciences frames
     tmcalib = tmcalib[(tmcalib["filter"].mask) | (tmcalib["filter"] == t["filter"][0])]
     if "readoutm" in t.colnames:
         readoutm = t["readoutm"][0]
