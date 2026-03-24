@@ -130,7 +130,19 @@ def update_mcalibs(t, file, header, obsparam):
     else:
         filter = ""
     ccdtemp = header[obsparam["ccd_temp"]]
-    new_row = [str(file), date_obs, jd_obs, binning, typ, filter, ccdtemp]
+    naxis1 = header["NAXIS1"]
+    naxis2 = header["NAXIS2"]
+    new_row = [
+        str(file),
+        date_obs,
+        jd_obs,
+        binning,
+        typ,
+        filter,
+        ccdtemp,
+        naxis1,
+        naxis2,
+    ]
     if "readoutm" in obsparam.keys():
         readoutm = header[obsparam["readoutm"]]
         new_row.append(readoutm)
@@ -199,8 +211,20 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
             "type",
             "filter",
             "ccd_temp",
+            "naxis1",
+            "naxis2",
         ]
-        dtypes = ["U200", "U30", "float64", "int64", "U10", "U10", "float64"]
+        dtypes = [
+            "U200",
+            "U30",
+            "float64",
+            "int64",
+            "U10",
+            "U10",
+            "float64",
+            "int64",
+            "int64",
+        ]
         if "readoutm" in obsparam.keys():
             col_names.append("readoutm")
             dtypes.append("U10")
