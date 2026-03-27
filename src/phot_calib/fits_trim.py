@@ -21,6 +21,7 @@ from astropy.io import fits
 # Plotting
 import matplotlib.pyplot as plt
 
+import numpy as np
 
 # Image vizualization
 from image_scaling import z_scale  # type: ignore
@@ -86,6 +87,7 @@ def fits_trim(file, trim, overwrite=False, verbose=False, display=False):
         file = file.with_stem(file.stem + "_trim")
     if verbose:
         print(f"> Writing trimmed file to : {file}")
+    datat = datat.astype(np.float32)  # convert to float32
     fits.writeto(file, datat, header, overwrite=True)
     return
 

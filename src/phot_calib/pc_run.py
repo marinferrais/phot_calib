@@ -17,6 +17,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from tqdm.auto import tqdm
+import numpy as np
 
 from astropy.io import fits, ascii
 from astropy.table import Table, unique
@@ -241,6 +242,7 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
         header = fits.getheader(bias[0])
         header = edit_header(header, n=len(bias))
         mbias_file = dir_datacalib / f"mbias_B{binning}.fits"
+        mbias = mbias.astype(np.float32)  # convert to float32
         fits.writeto(mbias_file, mbias, header, overwrite=True)
         tmcalib = update_mcalibs(tmcalib, mbias_file, header, obsparam)
         new_bias = True
@@ -259,6 +261,7 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
         header = fits.getheader(darks[0])
         header = edit_header(header, n=len(bias), mbias_file=mbias_file)
         mdark_file = dir_datacalib / f"mdark_B{binning}.fits"
+        mdark = mdark.astype(np.float32)  # convert to float32
         fits.writeto(mdark_file, mdark, header, overwrite=True)
         tmcalib = update_mcalibs(tmcalib, mdark_file, header, obsparam)
         new_dark = True
@@ -288,6 +291,7 @@ def make_mcalibs(traw, obsparam, logfile_mcalibs, dir_datacalib, nmin=5, display
             )
             mflat_file = f"mflat_{header[obsparam['filter']]}_B{binning}.fits"
             mflat_file = dir_datacalib / mflat_file
+            mflat = mflat.astype(np.float32)  # convert to float32
             fits.writeto(mflat_file, mflat, header, overwrite=True)
             tmcalib = update_mcalibs(tmcalib, mflat_file, header, obsparam)
 
@@ -366,6 +370,7 @@ def calibration_sequence(t, obsparam, logfile_mcalibs, dir_datacalib):
         )
         calibname = f"{obsparam['observatory_abbrv']}_{header[obsparam['date_obs']][:-4].replace(':', '-')}_{header[obsparam['filter']]}.fits"
         calibname = dir_datacalib / calibname
+        calib_data = calib_data.astype(np.float32)  # convert to float32
         fits.writeto(calibname, calib_data, header, overwrite=True)
 
 
