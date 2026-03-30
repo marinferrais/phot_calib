@@ -368,7 +368,7 @@ def calibration_sequence(t, obsparam, logfile_mcalibs, dir_datacalib):
         header = edit_header(
             header, mbias_file=mbias_file, mdark_file=mdark_file, mflat_file=mflat_file
         )
-        date4name = header[obsparam["date_obs"]][:-4].split(".")[0]
+        date4name = header[obsparam["date_obs"]].split(".")[0]
         calibname = f"{obsparam['observatory_abbrv']}_{date4name}_{header[obsparam['filter']]}.fits"
         calibname = dir_datacalib / calibname
         calib_data = calib_data.astype(np.float32)  # convert to float32
