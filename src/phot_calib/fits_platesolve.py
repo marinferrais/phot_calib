@@ -86,7 +86,7 @@ def fits_platesolve(
         # we only keep stars 0.01 degree apart from each other
         all_radecs = sparsify(all_radecs, 0.01)
 
-    for file in tqdm(filenames):
+    for file in tqdm(filenames, desc="Plate-solving ..."):
         if verbose:
             tqdm.write(f"Plate-solving {file} ...")
         with fits.open(file, mode="update") as hdul:
