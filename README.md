@@ -31,7 +31,7 @@ uv sync
 
 ## Usage
 
-0. Add your telescope setings in setup/telescopes.py if needed:
+0. Add your telescope settings in setup/telescopes.py if needed:
 
 1. Raw data structure example for a telescope named myobservatory (MO):
 ```text
