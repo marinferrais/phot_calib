@@ -63,6 +63,9 @@ def fits_platesolve(
     -------
 
     """
+    if len(filenames) == 0:
+        print("No files to plate-solve")
+        return
     file = filenames[len(filenames) // 2]
     with fits.open(file) as hdul:
         data = hdul[0].data
